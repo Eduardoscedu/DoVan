@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">DoVan</string>
+    <string name="login">Login\n</string>
+    <string name="email">Email\n\n</string>
+    <string name="senha">Senha\n</string>
+    <string name="entrar">Entrar</string>
+    <string name="ainda_n_o_tem_conta_registre_se">Ainda não tem conta?, Registre-se</string>
+    <string name="esqueceu_sua_senha">Esqueceu sua senha</string>
+    <string name="criar_conta">Criando sua conta</string>
+    <string name="nome">Nome</string>
+    <string name="cpf">CPF</string>
+    <string name="emaill">Email</string>
+    <string name="confirmar_senha">Confirme sua senha</string>
+    <string name="registrar">Registrar</string>
+    <string name="bem_vindo_pais_ou_responsaveis">Bem vindo Pais ou Responsaveis</string>
+    <string name="close">Fechar</string>
+    <string name="escolha_tipo_de_conta">Escolha o tipo de conta</string>
+    <string name="motorista">Motorista Escolar</string>
+    <string name="motorista_sub">Gerencie rotas, presença e embarque</string>
+    <string name="pais">Pais ou Responsavies</string>
+    <string name="pais_sub">Acompanhe o filho em tempo real</string>
+    <string name="avancar">Avançar</string>
+    <string name="bem_vindo_motorista">Bem vindo Motorista</string>
+    <string name="data_de_nascimento">Data de Nascimento</string>
+    <string name="dd_mm_yyyy">(dd/mm/yyyy)</string>
+    <string name="status">Status</string>
+    <string name="completa_seu_cadastro">Completa Seu Cadastro</string>
+
+
+</resources>

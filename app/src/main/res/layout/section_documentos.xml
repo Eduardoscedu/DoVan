@@ -1,0 +1,9 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
+    <EditText android:id="@+id/etCnh" android:hint="Número da CNH" android:inputType="number" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+    <Button android:id="@+id/btnRg" android:text="Selecionar foto do RG" android:layout_width="match_parent" android:layout_height="wrap_content" />
+    <ImageView android:id="@+id/ivRg" android:layout_width="match_parent" android:layout_height="160dp" android:scaleType="centerCrop" android:adjustViewBounds="true"/>
+    <Button android:id="@+id/btnCnhFoto" android:text="Selecionar foto da CNH" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp"/>
+    <ImageView android:id="@+id/ivCnh" android:layout_width="match_parent" android:layout_height="160dp" android:scaleType="centerCrop" android:adjustViewBounds="true"/>
+    <Button android:id="@+id/btnSalvarDocs" android:text="Salvar documentos" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp"/>
+</LinearLayout>

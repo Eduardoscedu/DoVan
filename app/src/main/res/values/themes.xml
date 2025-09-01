@@ -1,0 +1,12 @@
+<!-- res/values/themes.xml -->
+<resources>
+    <style name="Theme.DoVan" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Paleta básica (Material3) -->
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorOnPrimary">@android:color/white</item>
+        <item name="colorSecondary">@color/teal_200</item>
+        <!-- Se usar status bar transparente / edge-to-edge -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+</resources>

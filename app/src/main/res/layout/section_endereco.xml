@@ -1,0 +1,10 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
+    <EditText android:id="@+id/etCep" android:hint="CEP" android:inputType="number" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+    <EditText android:id="@+id/etLogradouro" android:hint="Logradouro" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+    <EditText android:id="@+id/etNumero" android:hint="Número" android:inputType="number" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+    <EditText android:id="@+id/etBairro" android:hint="Bairro" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+    <EditText android:id="@+id/etCidade" android:hint="Cidade" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+    <EditText android:id="@+id/etUf" android:hint="UF" android:maxLength="2" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+    <Button android:id="@+id/btnSalvarEndereco" android:text="Salvar endereço" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp"/>
+</LinearLayout>

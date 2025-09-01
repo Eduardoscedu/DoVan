@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "636908045042",
+    "project_id": "dovan-8911a",
+    "storage_bucket": "dovan-8911a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:636908045042:android:83c5df074495dac4d4066b",
+        "android_client_info": {
+          "package_name": "com.example.dovan"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWSaX4rz4HQN7NjNhz1gaJw_b_LlF-DSY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

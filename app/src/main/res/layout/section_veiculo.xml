@@ -1,0 +1,9 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
+    <EditText android:id="@+id/etMarca" android:hint="Marca" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+    <EditText android:id="@+id/etCapacidade" android:hint="Capacidade máxima (assentos)" android:inputType="number" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+    <EditText android:id="@+id/etPlaca" android:hint="Placa (ABC1D23)" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+    <EditText android:id="@+id/etCor" android:hint="Cor" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+    <EditText android:id="@+id/etAno" android:hint="Ano" android:inputType="number" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+    <Button android:id="@+id/btnSalvarVeiculo" android:text="Salvar veículo" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp"/>
+</LinearLayout>

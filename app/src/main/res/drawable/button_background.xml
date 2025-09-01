@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_enabled="false">
+        <shape android:shape="rectangle">
+            <solid android:color="#BDBDBD"/> <!-- Cor do botão desativado -->
+            <corners android:radius="12dp"/>
+        </shape>
+    </item>
+
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#C62828"/> <!-- Vermelho mais escuro ao pressionar -->
+            <corners android:radius="12dp"/>
+        </shape>
+    </item>
+
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#F44336"/> <!-- Vermelho principal (cor do logo) -->
+            <corners android:radius="12dp"/>
+        </shape>
+    </item>
+</selector>
