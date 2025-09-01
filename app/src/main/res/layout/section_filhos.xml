@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingTop="4dp">
+
+    <!-- Lista dos filhos já cadastrados (renderizada dinamicamente) -->
+    <LinearLayout
+        android:id="@+id/containerFilhos"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" />
+
+    <!-- Form para adicionar novo filho -->
+    <EditText
+        android:id="@+id/etFilhoNome"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nome completo do filho" />
+
+    <EditText
+        android:id="@+id/etFilhoNascimento"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Data de nascimento (dd/mm/aaaa)"
+        android:inputType="number" />
+
+    <EditText
+        android:id="@+id/etFilhoEscola"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Escola (opcional)" />
+
+    <EditText
+        android:id="@+id/etFilhoObs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Observações (alergias, restrições, etc.)"
+        android:lines="3"
+        android:gravity="top|start" />
+
+    <Button
+        android:id="@+id/btnAdicionarFilho"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Adicionar filho" />
+</LinearLayout>

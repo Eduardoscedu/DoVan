@@ -29,9 +29,10 @@ class FullRegisterFamily : AppCompatActivity() {
     // Ajuste os ícones conforme os que você já tem no projeto.
     // Importante: use apenas SectionType que EXISTEM no seu enum.
     private val items = listOf(
-        Section(R.drawable.ic_badge, "Documentos", SectionType.DOCUMENTOS),
         Section(R.drawable.ic_location, "Endereço", SectionType.ENDERECO),
+        Section(R.drawable.ic_children, "Filhos", SectionType.FILHOS),
         Section(R.drawable.ic_check, "Contato de Emergência", SectionType.CONTATO)
+
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {

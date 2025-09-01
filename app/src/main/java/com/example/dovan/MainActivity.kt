@@ -58,7 +58,8 @@ class MainActivity : AppCompatActivity() {
 
                     validateAfterLogin(uid,
                         onCompleteOk = {
-                            startActivity(Intent(this, MenuActivity::class.java)
+                            // navegação quando já está tudo completo
+                            startActivity(Intent(this, MenuFamiliesActivity::class.java)
                                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK))
                             finish()
                         },
@@ -104,7 +105,7 @@ class MainActivity : AppCompatActivity() {
             .addOnSuccessListener { snap ->
                 if (snap.exists()) {
                     val data = snap.data ?: emptyMap<String, Any?>()
-                    val missing = computeMissingForDriver(data)
+                    val missing = computeMissingForDriver(data) // CHANGED: função robusta (dot/aninhado)
                     if (missing.isEmpty()) onCompleteOk() else onNeedCompleteDriver(missing)
                 } else {
                     // Tenta FAMILIES
@@ -112,7 +113,7 @@ class MainActivity : AppCompatActivity() {
                         .addOnSuccessListener { fsnap ->
                             if (fsnap.exists()) {
                                 val data = fsnap.data ?: emptyMap<String, Any?>()
-                                val missing = computeMissingForFamily(data)
+                                val missing = computeMissingForFamily(data) // CHANGED
                                 if (missing.isEmpty()) onCompleteOk() else onNeedCompleteFamily(missing)
                             } else {
                                 onNoProfile()
@@ -130,52 +131,91 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
+    // ---------------- Helpers para ler tanto dot-path quanto aninhado ----------------
+    // CHANGED: estes helpers permitem que funcione mesmo se os campos estiverem salvos
+    // como "address.cep" (flat) ou como { address: { cep: ... } } (aninhado).
+    private fun getNestedOrFlat(m: Map<String, Any?>, path: String): Any? {
+        var cur: Any? = m
+        for (k in path.split(".")) {
+            cur = (cur as? Map<*, *>)?.get(k)
+            if (cur == null) break
+        }
+        if (cur != null) return cur
+        return m[path]
+    }
+    private fun str(m: Map<String, Any?>, path: String): String =
+        (getNestedOrFlat(m, path) as? String).orEmpty()
+    private fun num(m: Map<String, Any?>, path: String): Int =
+        (getNestedOrFlat(m, path) as? Number)?.toInt() ?: 0
+
+    // ---------------- Validações ----------------
+
+    // CHANGED: Driver verifica Documentos + Veículo + Endereço + Contato
     private fun computeMissingForDriver(data: Map<String, Any?>): List<String> {
         val falta = mutableListOf<String>()
-        val docs = data["docs"] as? Map<*, *>
-        val cnhNumber = (docs?.get("cnhNumber") as? String).orEmpty()
-        if (cnhNumber.isBlank()) falta.add("Número da CNH")
 
-        val vehicle = data["vehicle"] as? Map<*, *>
-        if ((vehicle?.get("marca") as? String).isNullOrBlank()) falta.add("Marca do veículo")
-        if ((vehicle?.get("placa") as? String).isNullOrBlank()) falta.add("Placa do veículo")
+        // Documentos
+        if (str(data, "docs.cnhNumber").isBlank()) falta += "Número da CNH"
 
-        val addr = data["address"] as? Map<*, *>
-        if ((addr?.get("cep") as? String).isNullOrBlank()) falta.add("CEP")
-        if ((addr?.get("cidade") as? String).isNullOrBlank()) falta.add("Cidade")
-        if ((addr?.get("uf") as? String).isNullOrBlank()) falta.add("UF")
+        // Veículo
+        if (str(data, "vehicle.marca").isBlank()) falta += "Marca do veículo"
+        if (str(data, "vehicle.placa").isBlank()) falta += "Placa do veículo"
 
-        val em = data["emergency"] as? Map<*, *>
-        if ((em?.get("nome") as? String).isNullOrBlank()) falta.add("Nome do contato de emergência")
-        if ((em?.get("telefone") as? String).isNullOrBlank()) falta.add("Telefone do contato de emergência")
+        // Endereço
+        if (str(data, "address.cep").isBlank())    falta += "CEP"
+        if (str(data, "address.cidade").isBlank()) falta += "Cidade"
+        if (str(data, "address.uf").isBlank())     falta += "UF"
+
+        // Contato de Emergência
+        if (str(data, "emergency.nome").isBlank())     falta += "Nome do contato de emergência"
+        if (str(data, "emergency.telefone").isBlank()) falta += "Telefone do contato de emergência"
 
         return falta
     }
 
+    // CHANGED: Família NÃO valida Documentos
     private fun computeMissingForFamily(data: Map<String, Any?>): List<String> {
         val falta = mutableListOf<String>()
-        val docs = data["docs"] as? Map<*, *>
-        if ((docs?.get("cnhNumber") as? String).isNullOrBlank()) falta.add("Número da CNH")
 
-        val addr = data["address"] as? Map<*, *>
-        if ((addr?.get("cep") as? String).isNullOrBlank()) falta.add("CEP")
-        if ((addr?.get("cidade") as? String).isNullOrBlank()) falta.add("Cidade")
-        if ((addr?.get("uf") as? String).isNullOrBlank()) falta.add("UF")
+        // Endereço
+        if (str(data, "address.cep").isBlank())    falta += "CEP"
+        if (str(data, "address.cidade").isBlank()) falta += "Cidade"
+        if (str(data, "address.uf").isBlank())     falta += "UF"
 
-        val em = data["emergency"] as? Map<*, *>
-        if ((em?.get("nome") as? String).isNullOrBlank()) falta.add("Nome do contato de emergência")
-        if ((em?.get("telefone") as? String).isNullOrBlank()) falta.add("Telefone do contato de emergência")
+        // Contato de Emergência
+        if (str(data, "emergency.nome").isBlank())     falta += "Nome do contato de emergência"
+        if (str(data, "emergency.telefone").isBlank()) falta += "Telefone do contato de emergência"
+
+        // (Opcional) Exigir ao menos 1 filho:
+        // val children = getNestedOrFlat(data, "children") as? List<*> ?: emptyList<Any>()
+        // if (children.isEmpty()) falta += "Pelo menos 1 filho"
 
         return falta
     }
 
+    // ---------------- Diálogo enxuto ----------------
     private fun showMissingDialog(missing: List<String>, goAction: () -> Unit) {
-        val msg = "Você ainda precisa preencher:\n\n• " + missing.joinToString("\n• ")
+        val bullets = missing.joinToString(separator = "\n") { "• $it" }
+
+        val title = when (missing.size) {
+            0 -> "Tudo certo!"
+            1 -> "Falta 1 item"
+            else -> "Faltam ${missing.size} Itens a serem Cadastrados"
+        }
+
+        val positive = if (missing.size <= 1) "Preencher agora" else "Completar agora"
+
+        val message = if (missing.isEmpty()) {
+            "Seu cadastro já está completo."
+        } else {
+            bullets // apenas o que falta
+        }
+
         AlertDialog.Builder(this)
-            .setTitle("Finalize seu cadastro")
-            .setMessage(msg)
-            .setPositiveButton("Completar agora") { _, _ -> goAction() }
+            .setTitle(title)
+            .setMessage(message)
             .setNegativeButton("Depois", null)
+            .setPositiveButton(positive) { _, _ -> goAction() }
             .show()
     }
 }

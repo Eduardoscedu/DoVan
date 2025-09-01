@@ -10,6 +10,7 @@ import androidx.core.view.children
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.card.MaterialCardView
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.firestore.ktx.firestore
@@ -66,6 +67,7 @@ class SectionAdapter(
             SectionType.VEICULO    -> bindVeiculo(inflater, holder.content)
             SectionType.ENDERECO   -> bindEndereco(inflater, holder.content)
             SectionType.CONTATO    -> bindContato(inflater, holder.content)
+            SectionType.FILHOS     -> bindFilhos(inflater, holder.content)
         }
 
         // Estado da seção
@@ -95,6 +97,132 @@ class SectionAdapter(
                 notifyItemChanged(position)
             }
         }
+    }
+
+
+    private fun childrenList(): List<Map<String, Any?>> {
+        val raw = getNestedOrFlat(data, "children")
+        @Suppress("UNCHECKED_CAST")
+        return when (raw) {
+            is List<*> -> raw.filterIsInstance<Map<String, Any?>>()
+            else -> emptyList()
+        }
+    }
+
+    // Máscara simples dd/mm/aaaa
+    private fun attachBirthMask(et: EditText) {
+        et.addTextChangedListener(object : android.text.TextWatcher {
+            private var isEditing = false
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: android.text.Editable?) {
+                if (isEditing) return
+                isEditing = true
+                val digits = s.toString().filter { it.isDigit() }.take(8)
+                val sb = StringBuilder()
+                for ((i, c) in digits.withIndex()) {
+                    sb.append(c)
+                    if (i == 1 || i == 3) sb.append('/')
+                }
+                et.setText(sb.toString())
+                et.setSelection(et.text?.length ?: 0)
+                isEditing = false
+            }
+        })
+    }
+
+    private fun bindFilhos(inflater: LayoutInflater, parent: ViewGroup) {
+        val v = inflater.inflate(R.layout.section_filhos, parent, false)
+        val container = v.findViewById<LinearLayout>(R.id.containerFilhos)
+        val etNome = v.findViewById<EditText>(R.id.etFilhoNome)
+        val etNasc = v.findViewById<EditText>(R.id.etFilhoNascimento)
+        val etEscola = v.findViewById<EditText>(R.id.etFilhoEscola)
+        val etObs = v.findViewById<EditText>(R.id.etFilhoObs)
+        val btnAdd = v.findViewById<Button>(R.id.btnAdicionarFilho)
+
+        // máscara dd/mm/aaaa no campo de nascimento
+        attachBirthMask(etNasc)
+
+        // Renderiza filhos já cadastrados (somente leitura)
+        container.removeAllViews()
+        val filhos = childrenList()
+        for (child in filhos) {
+            val nome = (child["nome"] as? String).orEmpty()
+            val dia  = (child["nascimentoDia"] as? Number)?.toInt()
+            val mes  = (child["nascimentoMes"] as? Number)?.toInt()
+            val ano  = (child["nascimentoAno"] as? Number)?.toInt()
+            val escola = (child["escola"] as? String).orEmpty()
+            val obs = (child["obs"] as? String).orEmpty()
+
+            val item = LinearLayout(parent.context).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(16, 12, 16, 12)
+            }
+            val tv = TextView(parent.context).apply {
+                text = buildString {
+                    append("• ").append(nome)
+                    if (dia != null && mes != null && ano != null) {
+                        append("  (").append(String.format("%02d/%02d/%04d", dia, mes, ano)).append(")")
+                    }
+                    if (escola.isNotBlank()) append("\nEscola: ").append(escola)
+                    if (obs.isNotBlank()) append("\nObs.: ").append(obs)
+                }
+            }
+            // “cinza” leve
+            item.alpha = 0.75f
+            item.isEnabled = false
+
+            item.addView(tv)
+            container.addView(item)
+        }
+
+        // Adicionar novo filho
+        btnAdd.setOnClickListener {
+            val nome = etNome.text.toString().trim()
+            val nasc = etNasc.text.toString().trim() // dd/mm/aaaa
+            val escola = etEscola.text.toString().trim()
+            val obs = etObs.text.toString().trim()
+
+            if (nome.isEmpty()) { etNome.error = "Informe o nome"; etNome.requestFocus(); return@setOnClickListener }
+            val digits = nasc.filter { it.isDigit() }
+            if (digits.length != 8) { etNasc.error = "Data inválida"; etNasc.requestFocus(); return@setOnClickListener }
+            val dia = digits.substring(0,2).toInt()
+            val mes = digits.substring(2,4).toInt()
+            val ano = digits.substring(4,8).toInt()
+
+            // monta o objeto filho
+            val child = hashMapOf(
+                "nome" to nome,
+                "nascimentoDia" to dia,
+                "nascimentoMes" to mes,
+                "nascimentoAno" to ano,
+                "escola" to escola,
+                "obs" to obs,
+                "createdAt" to System.currentTimeMillis()
+            )
+
+            val uid = uidProvider()
+            val ref = Firebase.firestore.collection(collectionName).document(uid)
+
+            // usamos arrayUnion para empilhar sem sobrescrever os existentes
+            ref.update("children", FieldValue.arrayUnion(child))
+                .addOnSuccessListener {
+                    toast(parent, "Filho adicionado!")
+                    // limpa inputs
+                    etNome.text?.clear()
+                    etNasc.text?.clear()
+                    etEscola.text?.clear()
+                    etObs.text?.clear()
+                }
+                .addOnFailureListener { e ->
+                    // se o campo não existir ainda, 'update' pode falhar; fazemos um merge criando o array
+                    ref.set(mapOf("children" to listOf(child)), SetOptions.merge())
+                        .addOnSuccessListener { toast(parent, "Filho adicionado!") }
+                        .addOnFailureListener { ex -> toast(parent, "Erro: ${ex.message}") }
+                }
+        }
+
+        parent.addView(v)
     }
 
     // ----------------- helpers para ler mapa (aninhado ou dot-path) -----------------
@@ -288,6 +416,7 @@ class SectionAdapter(
                 str("address.uf").isNotBlank()
         SectionType.CONTATO    -> str("emergency.nome").isNotBlank() &&
                 str("emergency.telefone").isNotBlank()
+        SectionType.FILHOS     -> childrenList().isNotEmpty()             // <-- NOVO (>= 1 filho)
     }
 
     private fun setCardDone(card: MaterialCardView, done: Boolean) {
